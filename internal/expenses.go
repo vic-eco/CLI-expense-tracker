@@ -28,11 +28,11 @@ func ListExpenses() error {
 	fmt.Fprintln(w, "ID\tDescription\tAmount\tCreated At")
 
 	for _, e := range expenses {
-		fmt.Fprintf(w, "%d\t%s\t$%.2f\t%s",
+		fmt.Fprintf(w, "%d\t%s\t$%.2f\t%s\n",
 			e.ID,
 			e.Description,
 			e.Amount,
-			e.CreatedAt.Format("2006-01-02 15:04:05"),
+			e.CreatedAt.Format("2006-01-02"),
 		)
 	}
 
