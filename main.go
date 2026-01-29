@@ -1,5 +1,15 @@
 package main
 
+import (
+	"expense-tracker/cmd"
+	"fmt"
+)
+
 func main() {
-	g
+	rootCmd := cmd.NewRootCMD()
+
+	err := rootCmd.Execute()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
