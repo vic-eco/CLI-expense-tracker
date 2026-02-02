@@ -54,8 +54,14 @@ func AddExpenses(desc string, amount float64) error {
 	}
 
 	expenses := result.Expenses
-	id := expenses[len(expenses)-1].ID
 
+	var id int
+	if len(expenses) == 0 {
+		id = 0
+	} else {
+		id = expenses[len(expenses)-1].ID
+	}
+	
 	newExpense := Expense{ID: id + 1, Description: desc, Amount: amount, CreatedAt: time.Now()}
 
 	expenses = append(expenses, newExpense)
@@ -66,4 +72,43 @@ func AddExpenses(desc string, amount float64) error {
 	}
 
 	return nil
+}
+
+func DeleteExpense(id int) error {
+	result, err := ReadExpensesFromFile()
+	if err != nil {
+		return err
+	}
+
+	if result.FileCreated || result.FileEmpty {
+		fmt.Println("Expenses file is empty")
+		return nil
+	}
+
+	expenses := result.Expenses
+	var found bool
+	for i, e := range expenses {
+		if e.ID == id {
+			expenses = deleteAtIndex(expenses, i)
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		fmt.Println("There is no expense with id:", id)
+		return nil
+	}
+
+	err = WriteExpensesToFile(expenses)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func deleteAtIndex(slice []Expense, index int) []Expense {
+	return append(slice[:index], slice[index+1:]...)
 }
