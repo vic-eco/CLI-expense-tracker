@@ -7,9 +7,6 @@ import (
 	"time"
 )
 
-type Database struct {
-	Expenses []Expense `json:"expenses"`
-}
 type Expense struct {
 	ID          int       `json:"id"`
 	Description string    `json:"description"`
@@ -18,10 +15,19 @@ type Expense struct {
 }
 
 func ListExpenses() error {
-	expenses, err := ReadExpensesFromFile()
+	result, err := ReadExpensesFromFile()
 	if err != nil {
 		return err
 	}
+	if result.FileCreated {
+		fmt.Println("File was just created, no past history")
+		return nil
+	} else if result.FileEmpty {
+		fmt.Println("No past history available")
+		return nil
+	}
+
+	expenses := result.Expenses
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
@@ -32,11 +38,32 @@ func ListExpenses() error {
 			e.ID,
 			e.Description,
 			e.Amount,
-			e.CreatedAt.Format("2006-01-02"),
+			e.CreatedAt.Format(time.DateOnly),
 		)
 	}
 
 	w.Flush()
+
+	return nil
+}
+
+func AddExpenses(desc string, amount float64) error {
+	result, err := ReadExpensesFromFile()
+	if err != nil {
+		return err
+	}
+
+	expenses := result.Expenses
+	id := expenses[len(expenses)-1].ID
+
+	newExpense := Expense{ID: id + 1, Description: desc, Amount: amount, CreatedAt: time.Now()}
+
+	expenses = append(expenses, newExpense)
+
+	err = WriteExpensesToFile(expenses)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

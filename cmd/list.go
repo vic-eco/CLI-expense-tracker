@@ -6,7 +6,7 @@ import (
 )
 
 func NewListCMD() *cobra.Command {
-	list := &cobra.Command{
+	listCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Lists all expenses",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -14,5 +14,5 @@ func NewListCMD() *cobra.Command {
 		},
 	}
 
-	return list
+	return listCmd
 }

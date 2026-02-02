@@ -2,50 +2,84 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"path"
 )
 
-func ReadExpensesFromFile() ([]Expense, error) {
+type ReadResult struct {
+	Expenses    []Expense
+	FileCreated bool
+	FileEmpty   bool
+}
 
+func ReadExpensesFromFile() (ReadResult, error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current working directory:", err)
-		return []Expense{}, err
+		return ReadResult{}, err
 	}
 
 	filepath := path.Join(wd, "data.json")
 
 	file, created, err := openFile(filepath)
+	if err != nil {
+		return ReadResult{}, err
+	}
 	if created {
-		fmt.Println("There is no history of past expenses")
-		return []Expense{}, nil
+		return ReadResult{
+			Expenses:    []Expense{},
+			FileCreated: true,
+		}, nil
 	}
 
 	defer file.Close()
 
 	bytes, _ := io.ReadAll(file)
 	if len(bytes) == 0 {
-		fmt.Println("There is no history of past expenses")
-		return []Expense{}, nil
+		return ReadResult{
+			Expenses:  []Expense{},
+			FileEmpty: true,
+		}, nil
 	}
 
-	var db Database
+	var expenses []Expense
 
-	err = json.Unmarshal(bytes, &db)
+	err = json.Unmarshal(bytes, &expenses)
 	if err != nil {
-		return nil, err
+		return ReadResult{}, err
 	}
 
-	return db.Expenses, nil
+	return ReadResult{Expenses: expenses}, nil
+}
+
+func WriteExpensesToFile(expenses []Expense) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	filepath := path.Join(wd, "data.json")
+
+	b, err := json.MarshalIndent(expenses, "", " ")
+	if err != nil {
+		return err
+	}
+
+	tmp := filepath + ".tmp"
+
+	err = os.WriteFile(tmp, b, 0644)
+	if err != nil {
+		return err
+	}
+
+	return os.Rename(tmp, filepath)
+
 }
 
 func openFile(filepath string) (f *os.File, created bool, er error) {
 
 	//If file is Created, it fails (err == nil)
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
+	file, err := os.OpenFile(filepath, os.O_RDONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err == nil {
 		return file, true, nil
 	}
