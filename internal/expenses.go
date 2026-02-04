@@ -61,7 +61,7 @@ func AddExpenses(desc string, amount float64) error {
 	} else {
 		id = expenses[len(expenses)-1].ID
 	}
-	
+
 	newExpense := Expense{ID: id + 1, Description: desc, Amount: amount, CreatedAt: time.Now()}
 
 	expenses = append(expenses, newExpense)
@@ -107,6 +107,44 @@ func DeleteExpense(id int) error {
 
 	return nil
 
+}
+
+func SummarizeExpenses(month int) error {
+
+	if month > 12 || month < 0 {
+		fmt.Println("Invalid month")
+		return nil
+	}
+
+	result, err := ReadExpensesFromFile()
+	if err != nil {
+		return err
+	}
+
+	if result.FileCreated || result.FileEmpty {
+		fmt.Println("No data to summarize")
+		return nil
+	}
+
+	expenses := result.Expenses
+
+	sum := 0.0
+
+	if month != 0 {
+		for _, e := range expenses {
+			if e.CreatedAt.Month() == time.Month(month) {
+				sum += e.Amount
+			}
+		}
+		fmt.Printf("Total expenses for %s: $%.2f", time.Month(month), sum)
+	} else {
+		for _, e := range expenses {
+			sum += e.Amount
+		}
+		fmt.Printf("Total expenses: $%.2f", sum)
+	}
+
+	return nil
 }
 
 func deleteAtIndex(slice []Expense, index int) []Expense {
