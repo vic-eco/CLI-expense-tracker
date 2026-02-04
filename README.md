@@ -28,7 +28,7 @@ A command-line tool build in Go to track your expenses.
 2. Build the executable
    
    ```bash
-   go build -o expense-tracker .\main.go
+   go build -o expense-tracker .
    ```
 
 3. Run commands
