@@ -5,9 +5,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var month int
-
 func NewSummaryCMD() *cobra.Command {
+	var month int
+
 	summaryCmd := &cobra.Command{
 		Use:   "summary",
 		Short: "Summarizes your expenses",

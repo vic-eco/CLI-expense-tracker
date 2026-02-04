@@ -5,10 +5,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var amount float64
-var description string
-
 func NewAddCMD() *cobra.Command {
+	var amount float64
+	var description string
+	
 	addCmd := &cobra.Command{
 		Use:   "add",
 		Short: "Adds expenses",
@@ -22,7 +22,7 @@ func NewAddCMD() *cobra.Command {
 	addCmd.Flags().StringVarP(&description, "description", "d", "", "Description of expense")
 
 	addCmd.MarkFlagRequired("amount")
-	addCmd.MarkFlagRequired("desc")
+	addCmd.MarkFlagRequired("description")
 
 	return addCmd
 }

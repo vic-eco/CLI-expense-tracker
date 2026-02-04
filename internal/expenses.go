@@ -100,13 +100,7 @@ func DeleteExpense(id int) error {
 		return nil
 	}
 
-	err = WriteExpensesToFile(expenses)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+	return WriteExpensesToFile(expenses)
 }
 
 func SummarizeExpenses(month int) error {
@@ -145,6 +139,39 @@ func SummarizeExpenses(month int) error {
 	}
 
 	return nil
+}
+
+func UpdateExpense(id int, description string, amount float64) error {
+	result, err := ReadExpensesFromFile()
+	if err != nil {
+		return err
+	}
+
+	if description == "" && amount < 0.0 {
+		fmt.Println("No update values provided")
+		return nil
+	}
+
+	var found bool
+	for i := range result.Expenses {
+		if result.Expenses[i].ID == id {
+			if description != "" {
+				result.Expenses[i].Description = description
+			}
+			if amount >= 0.0 {
+				result.Expenses[i].Amount = amount
+			}
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		fmt.Printf("Expense with id %d Not Found", id)
+		return nil
+	}
+
+	return WriteExpensesToFile(result.Expenses)
 }
 
 func deleteAtIndex(slice []Expense, index int) []Expense {

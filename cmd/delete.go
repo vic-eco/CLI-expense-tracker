@@ -5,9 +5,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var id int
-
 func NewDeleteCmd() *cobra.Command {
+	var id int
+
 	deleteCmd := &cobra.Command{
 		Use:   "delete",
 		Short: "Deletes an expense",
