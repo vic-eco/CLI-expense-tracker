@@ -71,6 +71,8 @@ func AddExpenses(desc string, amount float64) error {
 		return err
 	}
 
+	fmt.Printf("Expense added (ID: %d)", newExpense.ID)
+
 	return nil
 }
 
@@ -100,7 +102,14 @@ func DeleteExpense(id int) error {
 		return nil
 	}
 
-	return WriteExpensesToFile(expenses)
+	err = WriteExpensesToFile(expenses)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Expense deleted (ID: %d)", id)
+
+	return nil
 }
 
 func SummarizeExpenses(month int) error {
@@ -171,7 +180,14 @@ func UpdateExpense(id int, description string, amount float64) error {
 		return nil
 	}
 
-	return WriteExpensesToFile(result.Expenses)
+	err = WriteExpensesToFile(result.Expenses)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Expense updated (ID: %d)", id)
+
+	return nil
 }
 
 func deleteAtIndex(slice []Expense, index int) []Expense {
